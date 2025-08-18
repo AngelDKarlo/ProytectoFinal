@@ -4,11 +4,161 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro e-Coin</title>
-    <link rel="stylesheet" th:href="@{/css/Styles.css}" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .headerStandar {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            margin-right: 15px;
+        }
+
+        .headerStandar p {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+        }
+
+        .blob {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: 20%;
+            left: 10%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .register-wrapper {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            z-index: 10;
+            position: relative;
+        }
+
+        .register-wrapper h2 {
+            margin-bottom: 30px;
+            color: #333;
+            text-align: center;
+            font-size: 2em;
+        }
+
+        .register-wrapper label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .register-wrapper input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .register-wrapper input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .register-wrapper button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .register-wrapper button:hover {
+            transform: translateY(-2px);
+        }
+
+        .register-wrapper button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loginLink {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .loginLink a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .loginLink a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .register-wrapper {
+                margin: 20px;
+                padding: 30px;
+            }
+        }
+    </style>
 </head>
 <body>
 <header class="headerStandar">
-    <img class="logo" th:src="@{/images/logo.png}" />
+    <img class="logo" src="/logo.svg" width="100" height="100"/>
     <p>E-Coin</p>
 </header>
 <section>

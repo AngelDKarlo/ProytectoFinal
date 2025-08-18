@@ -120,12 +120,7 @@
             color: #0f9d58;
             margin-bottom: 5px;
         }
-
-        .stat-card .change {
-            font-size: 12px;
-            color: #0f9d58;
-        }
-
+        
         /* Lista de criptos */
         .crypto-list {
             background: linear-gradient(145deg, #2a2a50, #1e1e40);
@@ -193,26 +188,11 @@
             font-size: 16px;
             font-weight: bold;
         }
-
-        .crypto-values .change {
-            font-size: 12px;
-            margin: 5px 0;
-        }
-
         .crypto-values .holdings {
             font-size: 14px;
             color: #ccc;
         }
 
-        .positive {
-            color: #0f9d58;
-        }
-
-        .negative {
-            color: #ff4444;
-        }
-
-        /* Botón de opciones */
         .options-btn {
             background: rgba(255,255,255,0.1);
             border: none;
@@ -229,8 +209,7 @@
             background: #335099;
             transform: scale(1.1);
         }
-
-        /* Modal simple */
+        
         .modal {
             display: none;
             position: fixed;
@@ -299,27 +278,6 @@
             border-color: #ff4444;
         }
 
-        .quick-amounts {
-            display: flex;
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .quick-btn {
-            flex: 1;
-            padding: 8px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid #4a4a70;
-            border-radius: 5px;
-            color: white;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .quick-btn:hover {
-            background: #335099;
-        }
-
         .total-info {
             background: rgba(255,255,255,0.05);
             padding: 15px;
@@ -374,6 +332,7 @@
         .close:hover {
             color: white;
         }
+
     </style>
 </head>
 <body>
@@ -383,14 +342,13 @@
         <span style="font-size: 24px;">💼</span>
         <h1>Mi Wallet</h1>
     </div>
-    <div class="balance">$12,847.32</div>
+    <div class="balance" id="balance-header">$0.00</div>
 </header>
 
 <div class="container">
     <nav>
-        <a href="#" class="active">💼</a>
-        <a href="#" onclick="history.back()">📈</a>
-        <a href="#">⚙️</a>
+        <a href="wallet.html" class="active">💼</a>
+        <a href="principal.html">📈</a>
     </nav>
 
     <div class="main">
@@ -399,145 +357,38 @@
         <div class="stats">
             <div class="stat-card">
                 <h3>Valor Total</h3>
-                <div class="value">$12,847.32</div>
-                <div class="change">+2.48% hoy</div>
+                <div class="value" id="total-value">$0.00</div>
             </div>
             <div class="stat-card">
-                <h3>Ganancia</h3>
-                <div class="value">+$312.45</div>
-                <div class="change">+2.49%</div>
+                <h3>Saldo USD</h3>
+                <div class="value" id="usd-balance">$0.00</div>
             </div>
             <div class="stat-card">
-                <h3>Criptos</h3>
-                <div class="value">5</div>
-                <div class="change">activas</div>
+                <h3>Valor Cripto</h3>
+                <div class="value" id="crypto-value">$0.00</div>
             </div>
         </div>
 
         <div class="crypto-list">
             <h3>🪙 Mis Criptomonedas</h3>
-
-            <div class="crypto-item">
-                <div class="crypto-icon" style="background-color: #f7931a;">₿</div>
-                <div class="crypto-info">
-                    <div class="crypto-details">
-                        <h4>Bitcoin</h4>
-                        <p>BTC • 0.2845 disponibles</p>
-                    </div>
-                    <div class="crypto-values">
-                        <div class="price">$45,250.30</div>
-                        <div class="change positive">+1.24%</div>
-                        <div class="holdings">$12,872.16</div>
-                    </div>
+            <div id="crypto-holdings">
                 </div>
-                <button class="options-btn" onclick="openSell('Bitcoin', '₿', '#f7931a', 45250.30, 0.2845)">⋯</button>
-            </div>
-
-            <div class="crypto-item">
-                <div class="crypto-icon" style="background-color: #627eea;">Ξ</div>
-                <div class="crypto-info">
-                    <div class="crypto-details">
-                        <h4>Ethereum</h4>
-                        <p>ETH • 1.8945 disponibles</p>
-                    </div>
-                    <div class="crypto-values">
-                        <div class="price">$3,420.75</div>
-                        <div class="change negative">-0.85%</div>
-                        <div class="holdings">$6,478.92</div>
-                    </div>
-                </div>
-                <button class="options-btn" onclick="openSell('Ethereum', 'Ξ', '#627eea', 3420.75, 1.8945)">⋯</button>
-            </div>
-
-            <div class="crypto-item">
-                <div class="crypto-icon" style="background-color: #0033ad;">₳</div>
-                <div class="crypto-info">
-                    <div class="crypto-details">
-                        <h4>Cardano</h4>
-                        <p>ADA • 2,847.5 disponibles</p>
-                    </div>
-                    <div class="crypto-values">
-                        <div class="price">$0.785</div>
-                        <div class="change positive">+3.12%</div>
-                        <div class="holdings">$2,235.29</div>
-                    </div>
-                </div>
-                <button class="options-btn" onclick="openSell('Cardano', '₳', '#0033ad', 0.785, 2847.5)">⋯</button>
-            </div>
-
-            <div class="crypto-item">
-                <div class="crypto-icon" style="background-color: #e6007a;">●</div>
-                <div class="crypto-info">
-                    <div class="crypto-details">
-                        <h4>Polkadot</h4>
-                        <p>DOT • 42.8 disponibles</p>
-                    </div>
-                    <div class="crypto-values">
-                        <div class="price">$28.45</div>
-                        <div class="change positive">+5.67%</div>
-                        <div class="holdings">$1,217.66</div>
-                    </div>
-                </div>
-                <button class="options-btn" onclick="openSell('Polkadot', '●', '#e6007a', 28.45, 42.8)">⋯</button>
-            </div>
-
-            <div class="crypto-item">
-                <div class="crypto-icon" style="background-color: #375bd2;">⬡</div>
-                <div class="crypto-info">
-                    <div class="crypto-details">
-                        <h4>Chainlink</h4>
-                        <p>LINK • 325.7 disponibles</p>
-                    </div>
-                    <div class="crypto-values">
-                        <div class="price">$15.82</div>
-                        <div class="change negative">-2.34%</div>
-                        <div class="holdings">$5,154.59</div>
-                    </div>
-                </div>
-                <button class="options-btn" onclick="openSell('Chainlink', '⬡', '#375bd2', 15.82, 325.7)">⋯</button>
-            </div>
         </div>
     </div>
 </div>
 
-<!-- Modal de venta -->
 <div id="sellModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
         <h3>💸 Vender Cripto</h3>
-
-        <div class="selected-crypto" id="selectedCrypto">
-            <!-- Info de la cripto -->
-        </div>
-
+        <div class="selected-crypto" id="selectedCrypto"></div>
         <div>
             <label>Cantidad a vender:</label>
             <input type="number" id="amount" placeholder="¿Cuánto quieres vender?" oninput="calculate()">
-
-            <div class="quick-amounts">
-                <button class="quick-btn" onclick="setAmount(25)">25%</button>
-                <button class="quick-btn" onclick="setAmount(50)">50%</button>
-                <button class="quick-btn" onclick="setAmount(75)">75%</button>
-                <button class="quick-btn" onclick="setAmount(100)">Todo</button>
-            </div>
         </div>
-
-        <div>
-            <label>¿Cómo quieres cobrar?</label>
-            <select id="method">
-                <option value="bank">🏦 Mi banco</option>
-                <option value="paypal">💸 PayPal</option>
-                <option value="crypto">💰 Otra crypto</option>
-            </select>
-        </div>
-
         <div class="total-info" id="totalInfo" style="display: none;">
             <div>Recibirás: <strong id="totalAmount">$0</strong></div>
-            <div style="font-size: 12px; color: #ccc; margin-top: 5px;">
-                (Incluye comisión del 2%)
-            </div>
         </div>
-
         <div class="buttons">
             <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
             <button class="btn-sell" onclick="confirmSell()">Vender</button>
@@ -546,77 +397,140 @@
 </div>
 
 <script>
+    let API_BASE_URL = 'http://157.245.164.138:8080';
     let selectedCrypto = null;
 
-    function openSell(name, icon, color, price, available) {
-        selectedCrypto = { name, icon, color, price, available };
+    document.addEventListener("DOMContentLoaded", function() {
+        loadWalletData();
+    });
 
+    function log(message, type = 'info') {
+        alert(message);
+    }
+
+    async function makeRequest(url, options = {}) {
+        const token = localStorage.getItem("authToken");
+        if (token) {
+            options.headers = {
+                ...options.headers,
+                'Authorization': 'Bearer ' + token
+            };
+        }
+        try {
+            const response = await fetch(url, { mode: 'cors', ...options });
+            const responseData = await response.json();
+            return { data: responseData, status: response.status, ok: response.ok };
+        } catch (e) {
+            return { error: e.message, status: 0 };
+        }
+    }
+    
+    async function loadWalletData() {
+        const result = await makeRequest(`${API_BASE_URL}/api/portafolio/resumen`);
+
+        if (result.ok) {
+            const data = result.data;
+            document.getElementById('balance-header').textContent = `$${data.valorTotalPortafolio.toFixed(2)}`;
+            document.getElementById('total-value').textContent = `$${data.valorTotalPortafolio.toFixed(2)}`;
+            document.getElementById('usd-balance').textContent = `$${data.saldoUsd.toFixed(2)}`;
+            document.getElementById('crypto-value').textContent = `$${data.valorTotalCripto.toFixed(2)}`;
+            
+            const holdingsContainer = document.getElementById('crypto-holdings');
+            holdingsContainer.innerHTML = '';
+            
+            data.criptoHoldings.forEach(holding => {
+                const item = document.createElement('div');
+                item.className = 'crypto-item';
+                item.innerHTML = `
+                    <div class="crypto-icon" style="background-color: #f7931a;">${holding.simbolo.charAt(0)}</div>
+                    <div class="crypto-info">
+                        <div class="crypto-details">
+                            <h4>${holding.nombre}</h4>
+                            <p>${holding.simbolo} • ${holding.cantidad} disponibles</p>
+                        </div>
+                        <div class="crypto-values">
+                            <div class="price">$${holding.precioActual.toFixed(4)}</div>
+                            <div class="holdings">$${holding.valorTotal.toFixed(2)}</div>
+                        </div>
+                    </div>
+                    <button class="options-btn" onclick='openSell(${JSON.stringify(holding)})'>Vender</button>
+                `;
+                holdingsContainer.appendChild(item);
+            });
+        }
+    }
+
+    function openSell(holding) {
+        selectedCrypto = holding;
         document.getElementById('selectedCrypto').innerHTML = `
             <div class="crypto-summary">
-                <div class="icon" style="background-color: ${color};">${icon}</div>
+                <div class="icon" style="background-color: #f7931a;">${selectedCrypto.simbolo.charAt(0)}</div>
                 <div>
-                    <h4>${name}</h4>
-                    <p>${available} disponibles</p>
-                    <p style="color: #ff4444;">$${price.toFixed(2)} cada una</p>
+                    <h4>${selectedCrypto.nombre}</h4>
+                    <p>${selectedCrypto.cantidad} disponibles</p>
+                    <p style="color: #ff4444;">$${selectedCrypto.precioActual.toFixed(4)} cada una</p>
                 </div>
             </div>
         `;
 
         document.getElementById('sellModal').style.display = 'block';
-        document.getElementById('amount').value = '';
-        document.getElementById('totalInfo').style.display = 'none';
     }
 
     function closeModal() {
         document.getElementById('sellModal').style.display = 'none';
-    }
-
-    function setAmount(percent) {
-        if (!selectedCrypto) return;
-        const amount = (selectedCrypto.available * percent / 100).toFixed(6);
-        document.getElementById('amount').value = amount;
-        calculate();
+        selectedCrypto = null;
+        document.getElementById('amount').value = '';
+        document.getElementById('totalInfo').style.display = 'none';
     }
 
     function calculate() {
         if (!selectedCrypto) return;
 
         const amount = parseFloat(document.getElementById('amount').value) || 0;
-        const total = amount * selectedCrypto.price;
-        const fee = total * 0.02;
-        const net = total - fee;
+        const total = amount * selectedCrypto.precioActual;
 
         if (amount > 0) {
-            document.getElementById('totalAmount').textContent = '$' + net.toFixed(2);
+            document.getElementById('totalAmount').textContent = '$' + total.toFixed(2);
             document.getElementById('totalInfo').style.display = 'block';
         } else {
             document.getElementById('totalInfo').style.display = 'none';
         }
     }
-
-    function confirmSell() {
+    
+    async function confirmSell() {
         if (!selectedCrypto) return;
 
         const amount = parseFloat(document.getElementById('amount').value);
         if (!amount || amount <= 0) {
-            alert('Ingresa una cantidad válida');
+            log('Ingresa una cantidad válida', 'error');
+            return;
+        }
+        if (amount > selectedCrypto.cantidad) {
+            log('No tienes suficiente saldo para vender', 'error');
             return;
         }
 
-        if (amount > selectedCrypto.available) {
-            alert('No tienes suficiente');
-            return;
-        }
+        const requestBody = {
+            symboloCripto: selectedCrypto.simbolo,
+            tipoOperacion: 'VENTA',
+            cantidad: amount
+        };
 
-        const total = (amount * selectedCrypto.price * 0.98).toFixed(2);
+        const result = await makeRequest(`${API_BASE_URL}/api/trading/execute`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody)
+        });
 
-        if (confirm(`¿Vender ${amount} ${selectedCrypto.name}?\nRecibirás: $${total}`)) {
-            alert('¡Venta exitosa! 🎉');
+        if (result.ok && result.data.exitoso) {
+            log('¡Venta exitosa! 🎉', 'success');
             closeModal();
+            loadWalletData(); // Recargar datos
+        } else {
+            log('Error en la venta: ' + (result.data?.mensaje || result.error), 'error');
         }
     }
 
-    // Cerrar modal al hacer clic fuera
     window.onclick = function(event) {
         const modal = document.getElementById('sellModal');
         if (event.target === modal) {

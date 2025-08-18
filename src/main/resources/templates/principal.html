@@ -86,13 +86,27 @@
 
         /* Área derecha para Cryptos */
         aside.right {
-            width: 200px;
+            width: 250px;
             background-color: #262647;
             padding: 20px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
         }
+        .crypto-list-container {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        .crypto-list-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #4a4a70;
+            cursor: pointer;
+        }
+         .crypto-list-item:hover {
+            background-color: #335099;
+        }
+
 
         /* Botón de comprar */
         .btn-comprar {
@@ -106,6 +120,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(15, 157, 88, 0.3);
+            margin-top: 20px;
         }
 
         .btn-comprar:hover {
@@ -289,111 +304,136 @@
             height: 500px;
         }
 
-        pre {
-            margin-top: 20px;
-            background-color: rgba(255,255,255,0.05);
-            padding: 10px;
-            border-radius: 10px;
-            overflow-x: auto;
-        }
     </style>
     <script>
         google.charts.load('current', {'packages':['corechart']});
         google.charts.setOnLoadCallback(initChart);
 
         let API_BASE_URL = 'http://157.245.164.138:8080';
-        let csvData = [];
-        let chart, data;
-        let currentPrice = 12.59;
+        let chart, data, options;
+        let cryptoData = [];
+        let selectedCrypto = { symbol: 'ZOR', price: 0 }; // Default crypto
 
-        // === Sistema de mensajes (igual que login/register) ===
         function log(message, type = 'info') {
-            alert(message); // Simple, puedes cambiar a div flotante
-            console.log(`[${type.toUpperCase()}] ${message}`);
+            alert(message);
         }
 
         async function makeRequest(url, options = {}) {
+            const token = localStorage.getItem("authToken");
+            if (token) {
+                options.headers = {
+                    ...options.headers,
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                };
+            } else {
+                 options.headers = {
+                    ...options.headers,
+                    'Content-Type': 'application/json'
+                };
+            }
             try {
                 const response = await fetch(url, { mode: 'cors', ...options });
-                const responseText = await response.text();
-                let parsed;
-                try { parsed = JSON.parse(responseText); }
-                catch { return { error: 'Invalid JSON', raw: responseText, status: response.status }; }
-                return { data: parsed, status: response.status, ok: response.ok };
+                const responseData = await response.json();
+                return { data: responseData, status: response.status, ok: response.ok };
             } catch (e) {
+                console.error("Request failed:", e);
+                // Intenta parsear como texto si el JSON falla
+                try {
+                    const text = await response.text();
+                    console.error("Response text:", text);
+                } catch {}
                 return { error: e.message, status: 0 };
             }
         }
 
-        // === Gráfico con datos simulados ===
-        function initChart() {
+
+        async function initChart() {
             data = new google.visualization.DataTable();
             data.addColumn('string', 'Time');
-            data.addColumn('number', 'Low');
-            data.addColumn('number', 'Open');
-            data.addColumn('number', 'Close');
-            data.addColumn('number', 'High');
+            data.addColumn('number', 'Price');
 
-            csvData = [
-                {timestamp:"21:00:00", open:12.50, high:12.55, low:12.48, close:12.52, volume:5000},
-                {timestamp:"21:01:00", open:12.52, high:12.60, low:12.51, close:12.58, volume:7200},
-                {timestamp:"21:02:00", open:12.58, high:12.59, low:12.55, close:12.56, volume:6100}
-            ];
-            csvData.forEach(d => {
-                data.addRow([d.timestamp, d.low, d.open, d.close, d.high]);
-            });
+            options = {
+                title: 'Precio en las últimas 24 horas',
+                titleTextStyle: { color: '#FFF' },
+                legend: 'none',
+                backgroundColor: 'transparent',
+                colors: ['#0f9d58'],
+                hAxis: { textStyle: { color: '#ccc'} },
+                vAxis: { textStyle: { color: '#ccc'}, gridlines: { color: '#4a4a70' } }
+            };
 
-            chart = new google.visualization.CandlestickChart(document.getElementById('chart_div'));
-            drawChart();
-            setInterval(updateData, 5000);
+            chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+            
+            await loadAllCryptos();
+            await updateChartForSelectedCrypto();
+
+            setInterval(loadAllCryptos, 5000); 
+            setInterval(updateChartForSelectedCrypto, 30000);
         }
-
-        async function loadMarketPrices() {
+        
+        async function loadAllCryptos() {
             const result = await makeRequest(`${API_BASE_URL}/api/market/prices`);
-
-            if (!result.ok || !result.data) {
-                log("❌ No se pudieron cargar precios de mercado", "error");
-                return;
-            }
-
-            csvData = result.data; // usar los datos del backend
-            data.removeRows(0, data.getNumberOfRows());
-
-            csvData.forEach(d => {
-                data.addRow([d.timestamp, d.low, d.open, d.close, d.high]);
-            });
-
-            drawChart();
-
-            // precio actual = último close
-            if (csvData.length > 0) {
-                currentPrice = csvData[csvData.length - 1].close;
-                updateModalPrice();
+            if (result.ok) {
+                cryptoData = result.data.data;
+                updateCryptoList();
+                updateSelectedCryptoPrice();
             }
         }
 
-        function updateData() {
-            loadMarketPrices();
-            data.removeRows(0, data.getNumberOfRows());
-            csvData.forEach(d => {
-                data.addRow([d.timestamp, d.low, d.open, d.close, d.high]);
+        function updateCryptoList() {
+            const listElement = document.getElementById('cryptoList');
+            listElement.innerHTML = '';
+            cryptoData.forEach(crypto => {
+                const item = document.createElement('div');
+                item.className = 'crypto-list-item';
+                item.innerHTML = `
+                    <span>${crypto.nombre} (${crypto.simbolo})</span>
+                    <span>$${crypto.precio.toFixed(4)}</span>
+                `;
+                item.onclick = () => {
+                    selectedCrypto.symbol = crypto.simbolo;
+                    updateChartForSelectedCrypto();
+                };
+                listElement.appendChild(item);
             });
-            drawChart();
-            updateModalPrice();
+        }
+        
+        function updateSelectedCryptoPrice() {
+            const crypto = cryptoData.find(c => c.simbolo === selectedCrypto.symbol);
+            if (crypto) {
+                selectedCrypto.price = crypto.precio;
+            }
+        }
+
+        async function updateChartForSelectedCrypto() {
+            const result = await makeRequest(`${API_BASE_URL}/api/market/history/${selectedCrypto.symbol}?hours=24`);
+            
+            options.title = `Precio de ${selectedCrypto.symbol} en las últimas 24 horas`;
+
+            if (result.ok && result.data.data.length > 0) {
+                const historyData = result.data.data.map(item => {
+                    const date = new Date(item.timestamp);
+                    return [date.toLocaleTimeString(), item.precio];
+                });
+                data = new google.visualization.DataTable();
+                data.addColumn('string', 'Time');
+                data.addColumn('number', 'Price');
+                data.addRows(historyData);
+                drawChart();
+            } else {
+                data = new google.visualization.DataTable();
+                data.addColumn('string', 'Time');
+                data.addColumn('number', 'Price');
+                data.addRow(["Sin datos", 0]);
+                drawChart();
+            }
         }
 
         function drawChart() {
-            chart.draw(data, {
-                legend: 'none',
-                backgroundColor: 'transparent',
-                candlestick: {
-                    fallingColor: { strokeWidth: 0, fill: '#a52714' },
-                    risingColor: { strokeWidth: 0, fill: '#0f9d58' }
-                }
-            });
+            chart.draw(data, options);
         }
 
-        // === Modal de compra ===
         function openModal() {
             document.getElementById('buyModal').style.display = 'block';
             updateModalPrice();
@@ -401,61 +441,44 @@
 
         function closeModal() {
             document.getElementById('buyModal').style.display = 'none';
-            resetForm();
         }
 
         function updateModalPrice() {
-            document.getElementById('currentPrice').textContent = '$' + currentPrice.toFixed(2);
+            document.getElementById('currentPrice').textContent = '$' + selectedCrypto.price.toFixed(4);
             calculateTotal();
         }
 
         function calculateTotal() {
             const quantity = parseFloat(document.getElementById('quantity').value) || 0;
-            document.getElementById('totalAmount').textContent = '$' + (quantity * currentPrice).toFixed(2);
-        }
-
-        function resetForm() {
-            document.getElementById('quantity').value = '';
-            document.getElementById('paymentMethod').value = 'credit-card';
-            calculateTotal();
+            document.getElementById('totalAmount').textContent = '$' + (quantity * selectedCrypto.price).toFixed(2);
         }
 
         async function confirmPurchase() {
             const quantity = parseFloat(document.getElementById('quantity').value);
-            const paymentMethod = document.getElementById('paymentMethod').value;
-
             if (!quantity || quantity <= 0) {
                 log("❌ Ingresa una cantidad válida", "error");
                 return;
             }
 
-            const total = quantity * currentPrice;
             const requestBody = { 
-                quantity, 
-                price: currentPrice, 
-                total, 
-                paymentMethod 
+                symboloCripto: selectedCrypto.symbol,
+                tipoOperacion: "COMPRA",
+                cantidad: quantity
             };
 
-            // Enviar compra al backend
-            const result = await makeRequest(`${API_BASE_URL}/api/market/buy`, {
+            const result = await makeRequest(`${API_BASE_URL}/api/trading/execute`, {
                 method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + (localStorage.getItem("authToken") || "")
-                },
                 body: JSON.stringify(requestBody)
             });
 
-            if (result.ok) {
+            if (result.ok && result.data.exitoso) {
                 log("✅ Compra realizada exitosamente", "success");
                 closeModal();
             } else {
-                log("❌ Error en la compra: " + (result.data?.message || result.error), "error");
+                log("❌ Error en la compra: " + (result.data?.mensaje || result.error || "Error desconocido"), "error");
             }
         }
 
-        // Cerrar modal al hacer clic fuera
         window.onclick = function(event) {
             const modal = document.getElementById('buyModal');
             if (event.target === modal) closeModal();
@@ -471,15 +494,16 @@
 </header>
 <div class="container">
     <nav class="left">
-        <a title="Wallet"><i>💼</i></a>
-        <a title="Crypto"><img src="criptin.jpg" alt="Criptin"></a>
+        <a href="wallet.html" title="Wallet"><i>💼</i></a>
+        <a title="Crypto"><img src="images/criptin.jpg" alt="Criptin"></a>
     </nav>
     <div class="main">
         <div id="chart_div"></div>
     </div>
     <aside class="right">
-        <div>
+        <div class="crypto-list-container">
             <h2>Cryptos</h2>
+            <div id="cryptoList"></div>
         </div>
         <button class="btn-comprar" onclick="openModal()">
             💰 Comprar
@@ -487,11 +511,10 @@
     </aside>
 </div>
 
-<!-- Modal de compra -->
 <div id="buyModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3>💰 Comprar Cryptocurrency</h3>
+            <h3>💰 Comprar Criptomoneda</h3>
             <span class="close" onclick="closeModal()">&times;</span>
         </div>
 
@@ -505,15 +528,6 @@
         <div class="form-group">
             <label for="quantity">Cantidad a comprar:</label>
             <input type="number" id="quantity" min="0" step="0.01" oninput="calculateTotal()">
-        </div>
-
-        <div class="form-group">
-            <label for="paymentMethod">Método de pago:</label>
-            <select id="paymentMethod">
-                <option value="credit-card">💳 Tarjeta de Crédito</option>
-                <option value="paypal">💸 PayPal</option>
-                <option value="bank-transfer">🏦 Transferencia Bancaria</option>
-            </select>
         </div>
 
         <div class="total-display">
@@ -532,3 +546,4 @@
 
 </body>
 </html>
+

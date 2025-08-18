@@ -3,17 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" th:href="@{static/css/Styles.css}" />
     <title>Login e-Coin</title>
+    <style>
+        /* Add your CSS styles here */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .headerStandar {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            margin-right: 15px;
+        }
+
+        .headerStandar p {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+        }
+
+        .blob {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: 20%;
+            left: 10%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .login {
+            display: flex;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 900px;
+            width: 100%;
+            z-index: 10;
+            position: relative;
+        }
+
+        .loginForm {
+            flex: 1;
+            padding: 40px;
+        }
+
+        .loginForm h2 {
+            margin-bottom: 30px;
+            color: #333;
+            text-align: center;
+        }
+
+        .loginForm label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .loginForm input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .loginForm input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .loginForm button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .loginForm button:hover {
+            transform: translateY(-2px);
+        }
+
+        .loginForm button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .registerLink {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .registerLink a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .registerLink a:hover {
+            text-decoration: underline;
+        }
+
+        .text {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: white;
+        }
+
+        .text h2 {
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        .text p {
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .login {
+                flex-direction: column;
+                margin: 20px;
+            }
+            
+            .text {
+                order: -1;
+                text-align: center;
+                padding: 30px;
+            }
+            
+            .loginForm {
+                padding: 30px;
+            }
+        }
+    </style>
 </head>
 <body>
 <header class="headerStandar">
-    <img class="logo" th:src="@{/logo.svg}" width="100" height="100"/>
+    <img class="logo" src="/logo.svg" width="100" height="100"/>
     <p>E-Coin</p>
 </header>
 
 <section>
-    <!-- Fondo animado -->
     <div class="container">
         <div class="blob"></div>
     </div>
@@ -22,7 +207,6 @@
         <div class="loginForm">
             <h2>Iniciar Sesión</h2>
 
-            <!-- Mensajes de error/éxito -->
             <div id="mensaje" style="display: none; padding: 10px; margin-bottom: 15px; border-radius: 5px;"></div>
 
             <form id="loginForm">
@@ -39,7 +223,6 @@
             </p>
         </div>
 
-        <!-- Columna 2: Texto -->
         <div class="text">
             <h2>Bienvenido a e-Coin</h2>
             <p>Gestiona tus criptomonedas de manera fácil y segura.</p>
@@ -125,7 +308,7 @@
             localStorage.setItem("nombreUsuario", result.data.nombreUsuario);
 
             setTimeout(() => {
-                window.location.href = "dashboard.html";
+                window.location.href = "principal.html"; // Redirige a la página principal
             }, 1000);
         } else {
             log("❌ Error en login: " + (result.data?.message || result.error), "error");
