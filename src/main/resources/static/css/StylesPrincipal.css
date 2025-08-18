@@ -1,0 +1,110 @@
+.headerStandar {
+    background-color: #262647;
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #232323;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Header superior */
+header {
+    width: 100%;
+    height: 60px;
+    background-color: #262647;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+header h1 {
+    font-size: 20px;
+}
+
+/* Contenedor principal debajo del header */
+.container {
+    display: flex;
+    flex: 1;
+    margin-top: 60px; /* espacio para el header */
+    height: calc(100vh - 60px);
+}
+
+/* Nav lateral izquierdo */
+nav.left {
+    width: 80px;
+    background-color: #262647;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+}
+
+nav.left a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    height: 50px;
+    margin: 10px 0;
+    background-color: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s;
+    text-decoration: none;
+}
+
+nav.left a:hover {
+    background-color: #335099;
+}
+
+nav.left img, nav.left i {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+    color: white;
+}
+
+/* Ãrea derecha para Cryptos */
+aside.right {
+    width: 200px;
+    background-color: #262647;
+    padding: 20px;
+}
+
+/* Contenido principal (grÃ¡fica) */
+.main {
+    flex: 1;
+    padding: 20px;
+    overflow: auto;
+}
+
+#chart_div {
+    width: 100%;
+    height: 500px;
+}
+
+pre {
+    margin-top: 20px;
+    background-color: rgba(255,255,255,0.05);
+    padding: 10px;
+    border-radius: 10px;
+    overflow-x: auto;
+}

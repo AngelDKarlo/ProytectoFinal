@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" th:href="@{/css/Styles.css}" />
+  <title>Login e-Coin</title>
+</head>
+<body>
+<header class="headerStandar">
+  <img class="logo" th:src="@{/images/logo.svg}" width="100" height="100"/>
+  <p>E-Coin</p>
+</header>
+
+<section>
+  <!-- Fondo animado -->
+  <div class="container">
+    <div class="blob"></div>
+  </div>
+
+  <div class="login">
+    <div class="loginForm">
+      <h2>Iniciar Sesión</h2>
+
+      <!-- Mensajes de error/éxito -->
+      <div id="mensaje" style="display: none; padding: 10px; margin-bottom: 15px; border-radius: 5px;"></div>
+
+      <form id="loginForm">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="Escribe tu email" required>
+
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" name="password" placeholder="Escribe tu contraseña" required>
+
+        <button type="submit" id="btnLogin">Ingresar</button>
+      </form>
+      <p class="registerLink">
+        ¿No tienes una cuenta? <a href="register.html">Regístrate aquí</a>
+      </p>
+    </div>
+
+    <!-- Columna 2: Texto -->
+    <div class="text">
+      <h2>Bienvenido a e-Coin</h2>
+      <p>Gestiona tus criptomonedas de manera fácil y segura.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  // JavaScript para conectar con tu backend de Spring Boot
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const btnLogin = document.getElementById("btnLogin");
+    const mensajeDiv = document.getElementById("mensaje");
+
+    // Deshabilitar botón durante la petición
+    btnLogin.disabled = true;
+    btnLogin.textContent = "Ingresando...";
+
+    // Ocultar mensajes previos
+    mensajeDiv.style.display = "none";
+
+    try {
+      // Datos del formulario (debe coincidir con lo que espera tu AuthController)
+      const loginData = {
+        email: document.getElementById("email").value.trim(),
+        password: document.getElementById("password").value
+      };
+
+      console.log("🔄 Enviando datos de login:", loginData);
+
+      // Hacer petición a tu endpoint de Spring Boot
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify(loginData)
+      });
+
+      const result = await response.json();
+      console.log("📥 Respuesta del servidor:", result);
+
+      if (result.success) {
+        // Login exitoso
+        mostrarMensaje("✅ " + result.message, "success");
+
+        // Guardar datos del usuario en localStorage
+        localStorage.setItem("authToken", result.token);
+        localStorage.setItem("userId", result.userId);
+        localStorage.setItem("userEmail", result.email);
+        localStorage.setItem("nombreUsuario", result.nombreUsuario);
+
+        console.log("✅ Login exitoso. Redirigiendo...");
+
+        // Redirigir al dashboard después de 1 segundo
+        setTimeout(() => {
+          window.location.href = "dashboard.html"; // Cambia por tu página principal
+        }, 1000);
+
+      } else {
+        // Error en login
+        mostrarMensaje("❌ " + result.message, "error");
+      }
+
+    } catch (error) {
+      console.error("❌ Error en login:", error);
+      mostrarMensaje("❌ Error de conexión. Verifica que el servidor esté corriendo.", "error");
+    } finally {
+      // Restaurar botón
+      btnLogin.disabled = false;
+      btnLogin.textContent = "Ingresar";
+    }
+  });
+
+  // Función para mostrar mensajes
+  function mostrarMensaje(texto, tipo) {
+    const mensajeDiv = document.getElementById("mensaje");
+    mensajeDiv.textContent = texto;
+    mensajeDiv.style.display = "block";
+
+    if (tipo === "success") {
+      mensajeDiv.style.backgroundColor = "#d4edda";
+      mensajeDiv.style.color = "#155724";
+      mensajeDiv.style.border = "1px solid #c3e6cb";
+    } else if (tipo === "error") {
+      mensajeDiv.style.backgroundColor = "#f8d7da";
+      mensajeDiv.style.color = "#721c24";
+      mensajeDiv.style.border = "1px solid #f5c6cb";
+    }
+
+    // Auto-ocultar después de 5 segundos si es un error
+    if (tipo === "error") {
+      setTimeout(() => {
+        mensajeDiv.style.display = "none";
+      }, 5000);
+    }
+  }
+
+  // Función para verificar si ya está logueado (opcional)
+  function verificarSesion() {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      console.log("👤 Usuario ya logueado, redirigiendo...");
+      // Opcional: verificar si el token es válido con el servidor
+      // window.location.href = "dashboard.html";
+    }
+  }
+
+  // Verificar sesión al cargar la página
+  window.addEventListener("load", verificarSesion);
+
+  // Test de conexión con el servidor (opcional)
+  async function testConexion() {
+    try {
+      const response = await fetch("/api/auth/test");
+      const result = await response.json();
+      console.log("🧪 Test de conexión:", result);
+    } catch (error) {
+      console.error("❌ No se pudo conectar al servidor:", error);
+    }
+  }
+
+  // Ejecutar test al cargar (opcional, para debug)
+  // testConexion();
+</script>
+
+</body>
+</html>

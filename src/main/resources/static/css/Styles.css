@@ -1,0 +1,194 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+section {
+    position: relative;
+    height: 100vh;
+    background-color: #232323;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+}
+
+.container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0; /* Detrás de todo */
+}
+
+.blob {
+    width: 500px;
+    aspect-ratio: 1/1;
+    background: linear-gradient(#335099 0%, #5080af 40%, #ffe874 100%);
+    border-radius: 30% 70% 70% 30% / 30% 40% 70% 70%;
+    filter: blur(50px);
+    animation: change 6s linear infinite, rotate 12s linear infinite, move 18s cubic-bezier(0.445, 0.05, 0.55, 0.95) infinite alternate;
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes move {
+    0%, 100% { transform: translate(20%, 0); }
+    25% { transform: translate(35%, 10vh); }
+    50% { transform: translate(45%, 20vh); }
+    75% { transform: translate(25%, 30vh); }
+}
+
+@keyframes change {
+    0%, 100% { border-radius: 30% 70% 70% 30% / 30% 40% 70% 70%; }
+    25% { border-radius: 65% 40% 40% 20% / 40% 35% 35% 65%; }
+    50% { border-radius: 30% 70% 70% 30% / 30% 40% 70% 70%; }
+    75% { border-radius: 30% 70% 70% 30% / 30% 40% 70% 70%; }
+}
+
+.headerStandar {
+    background-color: #262647;
+}
+
+.login{
+    position: relative;
+    z-index: 3;
+    display: flex;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    overflow: hidden;
+    max-width: 900px;
+    width: 90%;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 30px rgba(0,0,0,0.3);
+}
+
+.loginForm {
+    flex: 1;
+    padding: 2px;
+    color: white;
+}
+
+.loginForm h2 {
+    margin-bottom: 1px;
+    font-size: 30px;
+}
+
+.loginForm label {
+    display: block;
+    margin: 5px 0 2px;
+    font-weight: bold;
+}
+
+.loginForm input {
+    width: 100%;
+    padding: 6px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+}
+
+.loginForm button {
+    width: 100%;
+    padding: 7px;
+    background-color: #335099;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.loginForm button:hover {
+    background-color: #5080af;
+}
+
+.registerLink a {
+    color: #ffe874;
+    text-decoration: none;
+}
+
+.registerLink a:hover {
+    text-decoration: underline;
+    color: #7fc6ff;
+}
+
+.text {
+    flex: 1;
+    padding: 2px;
+    background-color: rgba(0,0,0,0.2);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+@media (max-width: 1000px) {
+    .blob { width: 300px; }
+}
+
+@media (max-width: 800px) {
+    .login-wrapper { flex-direction: column; }
+    .login-text { display: none; }
+}
+
+@media (max-width: 600px) {
+    .blob { width: 230px; }
+}
+
+/*parte de registro*/
+.register-wrapper {
+    position: relative;
+    z-index: 3;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 2px;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 30px rgba(0,0,0,0.3);
+    color: white;
+    max-width: 500px;
+    width: 90%;
+}
+
+.register-wrapper h2 {
+    margin-bottom: 3px;
+    text-align: center;
+    font-size: 4px;
+}
+
+.register-wrapper label {
+    display: block;
+    margin: 5px 0 2px;
+    font-weight: bold;
+}
+
+.register-wrapper input {
+    width: 100%;
+    padding: 6px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+}
+
+.register-wrapper button {
+    width: 100%;
+    padding: 7px;
+    background-color: #335099;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.register-wrapper button:hover {
+    background-color: #5080af;
+}
+/*Estilo de la wallet*/
