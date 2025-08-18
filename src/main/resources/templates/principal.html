@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <title>Dashboard e-Coin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #232323;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Header superior */
+        header {
+            width: 100%;
+            height: 60px;
+            background-color: #262647;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        header h1 {
+            font-size: 20px;
+        }
+
+        /* Contenedor principal debajo del header */
+        .container {
+            display: flex;
+            flex: 1;
+            margin-top: 60px; /* espacio para el header */
+            height: calc(100vh - 60px);
+        }
+
+        /* Nav lateral izquierdo */
+        nav.left {
+            width: 80px;
+            background-color: #262647;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        nav.left a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 50px;
+            height: 50px;
+            margin: 10px 0;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-decoration: none;
+        }
+
+        nav.left a:hover {
+            background-color: #335099;
+        }
+
+        nav.left img, nav.left i {
+            width: 30px;
+            height: 30px;
+            object-fit: cover;
+            color: white;
+        }
+
+        /* Área derecha para Cryptos */
+        aside.right {
+            width: 200px;
+            background-color: #262647;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Botón de comprar */
+        .btn-comprar {
+            background: linear-gradient(135deg, #0f9d58, #0d8548);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(15, 157, 88, 0.3);
+        }
+
+        .btn-comprar:hover {
+            background: linear-gradient(135deg, #0d8548, #0a6b3a);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(15, 157, 88, 0.4);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #2a2a50, #1a1a35);
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 400px;
+            max-width: 90%;
+            border: 1px solid #4a4a70;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #4a4a70;
+        }
+
+        .modal-header h3 {
+            color: #0f9d58;
+            font-size: 20px;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ccc;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            background-color: #1a1a35;
+            border: 1px solid #4a4a70;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #0f9d58;
+            box-shadow: 0 0 10px rgba(15, 157, 88, 0.3);
+        }
+
+        .crypto-info {
+            background-color: rgba(15, 157, 88, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(15, 157, 88, 0.3);
+        }
+
+        .price-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .price-display .label {
+            color: #ccc;
+        }
+
+        .price-display .value {
+            color: #0f9d58;
+            font-weight: bold;
+        }
+
+        .total-display {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #0f9d58;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .btn-secondary {
+            background-color: #4a4a70;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a5a80;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0f9d58, #0d8548);
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0d8548, #0a6b3a);
+            transform: translateY(-1px);
+        }
+
+        /* Contenido principal (gráfica) */
+        .main {
+            flex: 1;
+            padding: 20px;
+            overflow: auto;
+        }
+
+        #chart_div {
+            width: 100%;
+            height: 500px;
+        }
+
+        pre {
+            margin-top: 20px;
+            background-color: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+    </style>
+    <script>
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(initChart);
+
+        let API_BASE_URL = 'http://157.245.164.138:8080';
+        let csvData = [];
+        let chart, data;
+        let currentPrice = 12.59;
+
+        // === Sistema de mensajes (igual que login/register) ===
+        function log(message, type = 'info') {
+            alert(message); // Simple, puedes cambiar a div flotante
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, { mode: 'cors', ...options });
+                const responseText = await response.text();
+                let parsed;
+                try { parsed = JSON.parse(responseText); }
+                catch { return { error: 'Invalid JSON', raw: responseText, status: response.status }; }
+                return { data: parsed, status: response.status, ok: response.ok };
+            } catch (e) {
+                return { error: e.message, status: 0 };
+            }
+        }
+
+        // === Gráfico con datos simulados ===
+        function initChart() {
+            data = new google.visualization.DataTable();
+            data.addColumn('string', 'Time');
+            data.addColumn('number', 'Low');
+            data.addColumn('number', 'Open');
+            data.addColumn('number', 'Close');
+            data.addColumn('number', 'High');
+
+            csvData = [
+                {timestamp:"21:00:00", open:12.50, high:12.55, low:12.48, close:12.52, volume:5000},
+                {timestamp:"21:01:00", open:12.52, high:12.60, low:12.51, close:12.58, volume:7200},
+                {timestamp:"21:02:00", open:12.58, high:12.59, low:12.55, close:12.56, volume:6100}
+            ];
+            csvData.forEach(d => {
+                data.addRow([d.timestamp, d.low, d.open, d.close, d.high]);
+            });
+
+            chart = new google.visualization.CandlestickChart(document.getElementById('chart_div'));
+            drawChart();
+            setInterval(updateData, 5000);
+        }
+
+        async function loadMarketPrices() {
+            const result = await makeRequest(`${API_BASE_URL}/api/market/prices`);
+
+            if (!result.ok || !result.data) {
+                log("❌ No se pudieron cargar precios de mercado", "error");
+                return;
+            }
+
+            csvData = result.data; // usar los datos del backend
+            data.removeRows(0, data.getNumberOfRows());
+
+            csvData.forEach(d => {
+                data.addRow([d.timestamp, d.low, d.open, d.close, d.high]);
+            });
+
+            drawChart();
+
+            // precio actual = último close
+            if (csvData.length > 0) {
+                currentPrice = csvData[csvData.length - 1].close;
+                updateModalPrice();
+            }
+        }
+
+        function updateData() {
+            loadMarketPrices();
+            data.removeRows(0, data.getNumberOfRows());
+            csvData.forEach(d => {
+                data.addRow([d.timestamp, d.low, d.open, d.close, d.high]);
+            });
+            drawChart();
+            updateModalPrice();
+        }
+
+        function drawChart() {
+            chart.draw(data, {
+                legend: 'none',
+                backgroundColor: 'transparent',
+                candlestick: {
+                    fallingColor: { strokeWidth: 0, fill: '#a52714' },
+                    risingColor: { strokeWidth: 0, fill: '#0f9d58' }
+                }
+            });
+        }
+
+        // === Modal de compra ===
+        function openModal() {
+            document.getElementById('buyModal').style.display = 'block';
+            updateModalPrice();
+        }
+
+        function closeModal() {
+            document.getElementById('buyModal').style.display = 'none';
+            resetForm();
+        }
+
+        function updateModalPrice() {
+            document.getElementById('currentPrice').textContent = '$' + currentPrice.toFixed(2);
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            const quantity = parseFloat(document.getElementById('quantity').value) || 0;
+            document.getElementById('totalAmount').textContent = '$' + (quantity * currentPrice).toFixed(2);
+        }
+
+        function resetForm() {
+            document.getElementById('quantity').value = '';
+            document.getElementById('paymentMethod').value = 'credit-card';
+            calculateTotal();
+        }
+
+        async function confirmPurchase() {
+            const quantity = parseFloat(document.getElementById('quantity').value);
+            const paymentMethod = document.getElementById('paymentMethod').value;
+
+            if (!quantity || quantity <= 0) {
+                log("❌ Ingresa una cantidad válida", "error");
+                return;
+            }
+
+            const total = quantity * currentPrice;
+            const requestBody = { 
+                quantity, 
+                price: currentPrice, 
+                total, 
+                paymentMethod 
+            };
+
+            // Enviar compra al backend
+            const result = await makeRequest(`${API_BASE_URL}/api/market/buy`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + (localStorage.getItem("authToken") || "")
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (result.ok) {
+                log("✅ Compra realizada exitosamente", "success");
+                closeModal();
+            } else {
+                log("❌ Error en la compra: " + (result.data?.message || result.error), "error");
+            }
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('buyModal');
+            if (event.target === modal) closeModal();
+        }
+    </script>
+</head>
+<body>
+<header>
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <img src="images/logo.svg" alt="Logo" style="width: 30px; height: 30px;">
+        <h1>Mi Dashboard</h1>
+    </div>
+</header>
+<div class="container">
+    <nav class="left">
+        <a title="Wallet"><i>💼</i></a>
+        <a title="Crypto"><img src="criptin.jpg" alt="Criptin"></a>
+    </nav>
+    <div class="main">
+        <div id="chart_div"></div>
+    </div>
+    <aside class="right">
+        <div>
+            <h2>Cryptos</h2>
+        </div>
+        <button class="btn-comprar" onclick="openModal()">
+            💰 Comprar
+        </button>
+    </aside>
+</div>
+
+<!-- Modal de compra -->
+<div id="buyModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>💰 Comprar Cryptocurrency</h3>
+            <span class="close" onclick="closeModal()">&times;</span>
+        </div>
+
+        <div class="crypto-info">
+            <div class="price-display">
+                <span class="label">Precio actual:</span>
+                <span class="value" id="currentPrice">$0.00</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="quantity">Cantidad a comprar:</label>
+            <input type="number" id="quantity" min="0" step="0.01" oninput="calculateTotal()">
+        </div>
+
+        <div class="form-group">
+            <label for="paymentMethod">Método de pago:</label>
+            <select id="paymentMethod">
+                <option value="credit-card">💳 Tarjeta de Crédito</option>
+                <option value="paypal">💸 PayPal</option>
+                <option value="bank-transfer">🏦 Transferencia Bancaria</option>
+            </select>
+        </div>
+
+        <div class="total-display">
+            <div class="price-display">
+                <span class="label">Total a pagar:</span>
+                <span class="value" id="totalAmount">$0.00</span>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+            <button class="btn-primary" onclick="confirmPurchase()">Confirmar Compra</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

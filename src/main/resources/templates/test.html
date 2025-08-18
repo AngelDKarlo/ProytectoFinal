@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Datos desde Java</title>
+</head>
+<body>
+<h1>Datos:</h1>
+<ul id="data-list"></ul>
+
+<script>
+    fetch('/api/data')
+        .then(response => response.json())
+        .then(data => {
+            const list = document.getElementById('data-list');
+            data.forEach(item => {
+                const listItem = document.createElement('li');
+                listItem.textContent = item;
+                list.appendChild(listItem);
+            });
+        })
+        .catch(error => console.error('Error:', error));
+</script>
+</body>
+</html>

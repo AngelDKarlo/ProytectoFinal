@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{static/css/Styles.css}" />
+    <title>Login e-Coin</title>
+</head>
+<body>
+<header class="headerStandar">
+    <img class="logo" th:src="@{/logo.svg}" width="100" height="100"/>
+    <p>E-Coin</p>
+</header>
+
+<section>
+    <!-- Fondo animado -->
+    <div class="container">
+        <div class="blob"></div>
+    </div>
+
+    <div class="login">
+        <div class="loginForm">
+            <h2>Iniciar Sesión</h2>
+
+            <!-- Mensajes de error/éxito -->
+            <div id="mensaje" style="display: none; padding: 10px; margin-bottom: 15px; border-radius: 5px;"></div>
+
+            <form id="loginForm">
+                <label for="loginTestEmail">Email</label>
+                <input type="email" id="loginTestEmail" name="email" placeholder="Escribe tu email" required>
+
+                <label for="loginTestPassword">Contraseña</label>
+                <input type="password" id="loginTestPassword" name="password" placeholder="Escribe tu contraseña" required>
+
+                <button type="submit" id="btnLogin">Ingresar</button>
+            </form>
+            <p class="registerLink">
+                ¿No tienes una cuenta? <a href="register.html">Regístrate aquí</a>
+            </p>
+        </div>
+
+        <!-- Columna 2: Texto -->
+        <div class="text">
+            <h2>Bienvenido a e-Coin</h2>
+            <p>Gestiona tus criptomonedas de manera fácil y segura.</p>
+        </div>
+    </div>
+</section>
+
+<script>
+    let API_BASE_URL = 'http://157.245.164.138:8080';
+
+    // Logs en pantalla
+    function log(message, type = 'info') {
+        const mensajeDiv = document.getElementById("mensaje");
+        mensajeDiv.textContent = message;
+        mensajeDiv.style.display = "block";
+
+        if (type === "success") {
+            mensajeDiv.style.backgroundColor = "#d4edda";
+            mensajeDiv.style.color = "#155724";
+            mensajeDiv.style.border = "1px solid #c3e6cb";
+        } else if (type === "error") {
+            mensajeDiv.style.backgroundColor = "#f8d7da";
+            mensajeDiv.style.color = "#721c24";
+            mensajeDiv.style.border = "1px solid #f5c6cb";
+        } else {
+            mensajeDiv.style.backgroundColor = "#d1ecf1";
+            mensajeDiv.style.color = "#0c5460";
+            mensajeDiv.style.border = "1px solid #bee5eb";
+        }
+    }
+
+    // Helper para requests
+    async function makeRequest(url, options = {}) {
+        try {
+            const response = await fetch(url, { mode: 'cors', ...options });
+            const responseText = await response.text();
+
+            let parsedResponse;
+            try {
+                parsedResponse = JSON.parse(responseText);
+            } catch {
+                return { error: 'Invalid JSON response', raw: responseText, status: response.status };
+            }
+
+            return { data: parsedResponse, status: response.status, ok: response.ok };
+        } catch (error) {
+            return { error: error.message, status: 0 };
+        }
+    }
+
+    // Login adaptado
+    async function testLogin(event) {
+        event.preventDefault();
+
+        const btnLogin = document.getElementById("btnLogin");
+        btnLogin.disabled = true;
+        btnLogin.textContent = "Ingresando...";
+
+        const email = document.getElementById('loginTestEmail').value;
+        const password = document.getElementById('loginTestPassword').value;
+
+        if (!email || !password) {
+            log("❌ Email y contraseña requeridos", "error");
+            btnLogin.disabled = false;
+            btnLogin.textContent = "Ingresar";
+            return;
+        }
+
+        const requestBody = { email, password };
+
+        const result = await makeRequest(`${API_BASE_URL}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (result.ok && result.data && result.data.token) {
+            log("✅ Login exitoso", "success");
+
+            localStorage.setItem("authToken", result.data.token);
+            localStorage.setItem("userId", result.data.userId);
+            localStorage.setItem("userEmail", result.data.email);
+            localStorage.setItem("nombreUsuario", result.data.nombreUsuario);
+
+            setTimeout(() => {
+                window.location.href = "dashboard.html";
+            }, 1000);
+        } else {
+            log("❌ Error en login: " + (result.data?.message || result.error), "error");
+        }
+
+        btnLogin.disabled = false;
+        btnLogin.textContent = "Ingresar";
+    }
+
+    document.getElementById("loginForm").addEventListener("submit", testLogin);
+</script>
+
+</body>
+</html>
